@@ -68,17 +68,6 @@ class PlotterController extends Controller
         $xPoint = round(rad2deg($lamda2), 6);
         return [$xPoint, $yPoint];
     }
-
-    // Scale distance to fit in canvas size
-    private function cartesianPoint($angle, $pointX1, $pointY1, $srcMax, $srcDistance, $desiredMax = 380){
-        $distance = round(($srcDistance * $desiredMax) / $srcMax, 2);
-
-        $angle = deg2rad($angle);
-        $pointX2 = $pointX1 + $distance * cos($angle);
-        $pointY2 = $pointY1 + $distance * sin($angle);
-        return [round($pointX2,6), round($pointY2,6)];
-    }
-
     // Build information array for each line
     private function informationBuilder($lotNumber, $direction, $angle, $minutes, $bearing, $distance){
         return [
@@ -108,12 +97,9 @@ class PlotterController extends Controller
 
             $tieAngle = $this->bearingToDegree($lotItem['TieDirection'].$lotItem['TieBearing'], $lotItem['TieDegree'] + ($lotItem['TieMinute'] / 60));
             $tieMapCoord = $this->destinationPoint($lotItem['TieDistance'], $tieAngle, $mLongitude, $mLatitude);
-            $tieCartesianCoord = $this->cartesianPoint($tieAngle, 0, 0,$maxDistancePoint, $lotItem['TieDistance']);
 
             $pLon = $tieMapCoord[0];
             $pLat = $tieMapCoord[1];
-            $cnvsX = $tieCartesianCoord[0];
-            $cnvsY = $tieCartesianCoord[1];
 
             $lotInfo = [
                 "LotName" => $lotItem['LotName'] ?? 'Lot '.($i+1),
@@ -129,23 +115,18 @@ class PlotterController extends Controller
             foreach($lotItem['LotCoordinates'] as $j => $pointItem){
                 $pointAngle = $this->bearingToDegree($pointItem['Direction'].$pointItem['Bearing'], $pointItem['Degree'] + ($pointItem['Minute'] / 60));
                 $pointMapCoord = $this->destinationPoint($pointItem['Distance'], $pointAngle, $tieMapCoord[0], $tieMapCoord[1]);
-                $pointCartesianCoord = $this->cartesianPoint($pointAngle, $tieCartesianCoord[0], $tieCartesianCoord[1], $maxDistancePoint, $pointItem['Distance']);
-
+    
                 $lotPointInfo = [
                     "PointNumber" => $j + 1,
                     "Direction" => $this->informationBuilder('Line '.($j+1), $pointItem['Direction'], $pointItem['Degree'], $pointItem['Minute'], $pointItem['Bearing'], $pointItem['Distance']),
                     "Latitude" => round($pLat,6),
                     "Longitude" => round($pLon,6),
-                    "CanvasY" => round($cnvsY,6),
-                    "CanvasX" => round($cnvsX,6),
                     "Distance" => $pointItem['Distance']
                 ];
                 array_push($lotInfo['LotPoints'], $lotPointInfo);
 
                 $pLon = $pointMapCoord[0];
                 $pLat = $pointMapCoord[1];
-                $cnvsX = $pointCartesianCoord[0];
-                $cnvsY = $pointCartesianCoord[1];
             }
             array_push($fullLotInfo, $lotInfo);
         }
