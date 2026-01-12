@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+
+/* Vue Multiselect Custom Overrides - Tailwind CSS Aligned */
+
+/* Base multiselect styles */
+.multiselect {
+    @apply text-slate-900 dark:text-white transition-colors;
+}
+
+/* Tags / Multi-select container */
+.multiselect__tags {
+    @apply border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-600 rounded-lg p-2 pl-2 pr-10;
+}
+
+.multiselect__tags:focus-within {
+    @apply border-blue-600 dark:border-blue-500 ring-2 ring-blue-500;
+}
+
+/* Single select display */
+.multiselect__single {
+    @apply m-0 bg-white dark:bg-slate-600 text-slate-900 dark:text-white rounded-lg;
+}
+
+.multiselect__current {
+    @apply border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white;
+}
+
+.multiselect__current:hover {
+    @apply border-slate-400 dark:border-slate-400;
+}
+
+/* Input field */
+.multiselect__input {
+    @apply bg-white dark:bg-slate-600 text-slate-900 dark:text-white border-0 rounded-lg;
+}
+
+.multiselect__input::placeholder {
+    @apply text-slate-400 dark:text-slate-400;
+}
+
+/* Dropdown content wrapper */
+.multiselect__content-wrapper {
+    @apply border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-600 rounded-b-lg shadow-lg;
+}
+
+.multiselect__content {
+    @apply p-0;
+}
+
+/* Options */
+.multiselect__option {
+    @apply px-3 py-3 text-slate-900 dark:text-white min-h-10 leading-4;
+}
+
+.multiselect__option:hover {
+    @apply bg-slate-100 dark:bg-slate-700;
+}
+
+/* Highlighted option (active/hovered) */
+.multiselect__option--highlight {
+    @apply bg-blue-600 text-white dark:bg-blue-600;
+}
+
+.multiselect__option--highlight::after {
+    @apply text-white bg-blue-600 dark:bg-blue-600;
+}
+
+/* Selected option */
+.multiselect__option--selected {
+    @apply bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 font-medium;
+}
+
+.multiselect__option--selected::after {
+    @apply text-blue-900 dark:text-blue-100;
+}
+
+/* Selected and highlighted */
+.multiselect__option--selected.multiselect__option--highlight {
+    @apply bg-blue-600 text-white dark:bg-blue-600;
+}
+
+.multiselect__option--selected.multiselect__option--highlight::after {
+    @apply bg-blue-600 text-white dark:bg-blue-600;
+}
+
+/* Tags */
+.multiselect__tag {
+    @apply bg-blue-600 text-white rounded px-2 py-1 mr-2 mb-1 inline-block;
+}
+
+.multiselect__tag-icon {
+    @apply w-5 rounded;
+}
+
+.multiselect__tag-icon::after {
+    @apply text-blue-800 text-sm;
+    content: "×";
+}
+
+.multiselect__tag-icon:hover::after {
+    @apply text-white;
+}
+
+/* Disabled state */
+.multiselect--disabled {
+    @apply bg-white dark:bg-slate-600 opacity-60 pointer-events-none rounded shadow-lg;
+}
+
+.multiselect--disabled .multiselect__current,
+.multiselect--disabled .multiselect__select {
+    @apply bg-white dark:bg-slate-600 text-slate-400 dark:text-slate-400;
+}
+
+.multiselect__option--disabled {
+    @apply bg-white dark:bg-slate-600 text-slate-400 dark:text-slate-400 cursor-not-allowed pointer-events-none;
+}
+
+/* Active state */
+.multiselect--active {
+    @apply z-50;
+}
+
+.multiselect--active:not(.multiselect--above) .multiselect__current,
+.multiselect--active:not(.multiselect--above) .multiselect__input,
+.multiselect--active:not(.multiselect--above) .multiselect__tags {
+    @apply rounded-b-none;
+}
+
+/* Placeholder styling */
+.multiselect__placeholder {
+    @apply m-0 text-slate-400 dark:text-slate-400 text-base;
+}
+
+.multiselect--active .multiselect__placeholder {
+    @apply hidden;
+}
+
+/* Spinner */
+.multiselect__spinner {
+    @apply bg-white dark:bg-slate-600;
+}
+
+.multiselect__spinner::before,
+.multiselect__spinner::after {
+    @apply border-blue-600;
+}
+
+/* Transitions */
+.multiselect {
+    @apply transition-all duration-150 ease-in-out;
+}

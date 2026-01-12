@@ -1,3 +1,38 @@
+const tieLocationList = ['Laguna', 'Cavite', 'Batangas'];
+const tieCityList = ['San Pedro', 'Biñan', 'Santa Rosa'];
+const tiePORList = ['Por 1', 'Por 2', 'Por 3'];
+
+function createPlotItem(plotname) {
+    return {
+        id: 'PI-' + Date.now(),
+        plotname: plotname,
+        tieLoc: '',
+        tieCity: '',
+        tiePOR: '',
+        tieLatitude: '',
+        tieLongitude: '',
+        tiedirection: {
+            direction: 'N',
+            degree: 0,
+            minutes: 0,
+            bearing: 'E',
+            distance: 0
+        },
+        points: []
+    };
+}
+
+function createPlotPoint() {
+    return {
+        id: 'PPT-' + Date.now(),
+        direction: 'N',
+        degree: 0,
+        minutes: 0,
+        bearing: 'E',
+        distance: 0
+    };
+}
+
 function extrapolatePoints (pointsArray, canvas, padding) {
     let latitudes = pointsArray.map(pt => pt.latitude);
     let longitudes = pointsArray.map(pt => pt.longitude);
@@ -36,4 +71,4 @@ function extrapolatePoints (pointsArray, canvas, padding) {
     return latLonToCanvas;
 }
 
-export { extrapolatePoints };
+export { createPlotItem, createPlotPoint, tieLocationList, tieCityList, tiePORList,  extrapolatePoints };

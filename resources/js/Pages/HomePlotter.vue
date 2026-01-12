@@ -1,136 +1,167 @@
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+<style src="../../css/multiselect.css"></style>
 <template>
     <Head title="Welcome | Land Plotter" />
-    
-    <div class="space-y-16">
+    <div>
         <!-- Hero Section -->
         <section class="text-center py-20">
             <h1 class="text-5xl font-bold text-slate-900 dark:text-white mb-6">
                 Welcome to Land Plotter
             </h1>
             <p class="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-                Visualize and calculate land coordinates with precision. Plot bearings and distances to map out your survey data with ease.
+                Visualize and calculate land coordinates with precision. Plot bearings and distances to map out your
+                survey data with ease.
             </p>
             <div class="flex gap-4 justify-center">
-                <Link 
-                    href="/plotter"
-                    class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-                >
+                <Link href="/plotter"
+                    class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
                     Get Started
                 </Link>
-                <Link 
-                    href="#features"
-                    class="px-8 py-3 border-2 border-slate-300 hover:border-slate-400 text-slate-900 dark:text-white font-semibold rounded-lg transition"
-                >
+                <Link href="#features"
+                    class="px-8 py-3 border-2 border-slate-300 hover:border-slate-400 text-slate-900 dark:text-white font-semibold rounded-lg transition">
                     Learn More
                 </Link>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section id="features" class="py-12">
-            <h2 class="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
-                Features
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
-                    <div class="text-4xl mb-4">📍</div>
-                    <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-3">Precise Plotting</h3>
-                    <p class="text-slate-600 dark:text-slate-300">
-                        Plot coordinates with high precision using bearings and distances. Ideal for land surveying and mapping.
-                    </p>
-                </div>
-                <div class="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
-                    <div class="text-4xl mb-4">📊</div>
-                    <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-3">Visual Representation</h3>
-                    <p class="text-slate-600 dark:text-slate-300">
-                        See your data visualized on an interactive canvas. Easy to understand and share with stakeholders.
-                    </p>
-                </div>
-                <div class="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
-                    <div class="text-4xl mb-4">⚡</div>
-                    <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-3">Fast & Reliable</h3>
-                    <p class="text-slate-600 dark:text-slate-300">
-                        Process large datasets quickly and accurately. Built for reliability and consistent performance.
-                    </p>
-                </div>
             </div>
         </section>
 
         <!-- Plotter Form Section -->
         <section id="plotter" class="py-12">
             <h2 class="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
-            Start Plotting
+                Start Plotting
             </h2>
-            <div class="max-w-4xl mx-auto bg-white dark:bg-slate-700 p-8 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="md:col-span-3">
-                <label for="input_lotTitle" class="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                    Lot Title
-                </label>
-                <input 
-                    type="text" 
-                    name="input_lotTitle" 
-                    id="input_lotTitle"
-                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
-                >
+            <div class="max-w-full mx-auto bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="md:col-span-3">
+                        <input type="text" id="input_lotTitle" v-model="lotTitle" placeholder="Lot title"
+                            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
-                <div class="md:col-span-6">
-                <label for="input_lotAddress" class="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                    Lot Address
-                </label>
-                <input 
-                    type="text" 
-                    name="input_lotAddress" 
-                    id="input_lotAddress"
-                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
-                >
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                <label for="input_Tieocation" class="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
+                <h2 class="block font-semibold text-slate-900 dark:text-white mt-3 mb-3">
                     Tie Point
-                </label>
-                <select 
-                    id="input_Tieocation" 
-                    name="input_Tieocation"
-                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
-                ></select>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <multiselect id="input_Tielocation" v-model="tieLoc" placeholder="Select location" 
+                        :options="tieLocOpts" 
+                        :disabled="fieldStates.tieLoc"
+                        :show-labels="false"
+                        ></multiselect>
+                    </div>
+                    <div>
+                        <multiselect id="input_Tiecity" v-model="tieCity" placeholder="Select location" 
+                        :options="tieCityOpts" 
+                        :disabled="fieldStates.tieCity"
+                        :show-labels="false"
+                        ></multiselect>
+                    </div>
+                    <div>
+                        <multiselect id="input_Tiepor" v-model="tiePOR" placeholder="Select location" 
+                        :options="tiePOROpts" 
+                        :disabled="fieldStates.tiePOR"
+                        :show-labels="false"
+                        ></multiselect>
+                    </div>
                 </div>
-                <div>
-                <label for="input_TieCity" class="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                    City
-                </label>
-                <select 
-                    id="input_TieCity" 
-                    name="input_TieCity" 
-                    disabled
-                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-slate-100 dark:bg-slate-500 text-slate-900 dark:text-white opacity-50 cursor-not-allowed focus:outline-none"
-                ></select>
+                <h2 class="block font-semibold text-slate-900 dark:text-white mt-3 mb-3">
+                    Coordinates
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <input type="text" id="input_TieLatitude" v-model="tieLatitude" placeholder="Latitude"
+                            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div>
+                        <input type="text" id="input_TieLongitude" v-model="tieLongitude" placeholder="Longitude"
+                            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
                 </div>
-                <div>
-                <label for="input_TiePOR" class="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                    POR
-                </label>
-                <select 
-                    id="input_TiePOR" 
-                    name="input_TiePOR" 
-                    disabled
-                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-slate-100 dark:bg-slate-500 text-slate-900 dark:text-white opacity-50 cursor-not-allowed focus:outline-none"
-                ></select>
-                </div>
-            </div>
-            </div>
-        </section>
 
-        
+                <div>
+                    <button class="mt-6 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
+                     @click="addNewPlot()">
+                        Add
+                    </button>
+                    <div v-for="plot in lotitems">
+                        <p>{{ plot.plotname }}</p>
+                        <button class="mt-6 px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                        v-if="lotitems.length > 1"
+                        @click="deletePlot(plot.id)">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--<pre class="text-white">
+                {{ lotitems }}
+            </pre>-->
+        </section>
     </div>
 </template>
 
+
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import Multiselect from 'vue-multiselect';
+import * as mapper from '../mapper.js';
+
+let lotTitle = ref('');
+let tieLoc = ref('');
+let tieCity = ref('');
+let tiePOR = ref('');
+let tieLatitude = ref('');
+let tieLongitude = ref('');
+
+let tieLocOpts = mapper.tieLocationList;
+let tieCityOpts = [];
+let tiePOROpts = [];
+
+let lotitems = ref([]);
+
+
+const fieldStates = computed(() => {
+    return {
+        tieLoc: tieLocOpts.length === 0,
+        tieCity: tieCityOpts.length === 0,
+        tiePOR: tiePOROpts.length === 0
+    };
+});
+
+const disabledClasses = computed(() => {
+    return 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-500';
+});
+
+const addNewPlot = () => {
+    // Logic to add new lot goes here
+    const newPlot = mapper.createPlotItem(`New Plot`);
+    for (let i = 0; i < 4; i++) {
+        const newPoint = mapper.createPlotPoint();
+        newPlot.points.push(newPoint);
+    }
+    lotitems.value.push(newPlot);
+};
+
+const deletePlot = (plotId) => {
+    lotitems.value = lotitems.value.filter(plot => plot.id !== plotId);
+};
+
+const addNewPoint = (plotId) => {
+    const plot = lotitems.value.find(plot => plot.id === plotId);
+    if (plot) {
+        const newPoint = mapper.createPlotPoint();
+        plot.points.push(newPoint);
+    }
+};
+
+const deletePoint = (plotId, pointId) => {
+    const plot = lotitems.value.find(plot => plot.id === plotId);
+    if (plot) {
+        plot.points = plot.points.filter(point => point.id !== pointId);
+    }
+};
+
+addNewPlot();
 </script>
