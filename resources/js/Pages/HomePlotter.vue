@@ -1,6 +1,7 @@
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../../css/multiselect.css"></style>
 <template>
+
     <Head title="Welcome | Land Plotter" />
     <div>
         <!-- Hero Section -->
@@ -12,16 +13,6 @@
                 Visualize and calculate land coordinates with precision. Plot bearings and distances to map out your
                 survey data with ease.
             </p>
-            <div class="flex gap-4 justify-center">
-                <Link href="/plotter"
-                    class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
-                    Get Started
-                </Link>
-                <Link href="#features"
-                    class="px-8 py-3 border-2 border-slate-300 hover:border-slate-400 text-slate-900 dark:text-white font-semibold rounded-lg transition">
-                    Learn More
-                </Link>
-            </div>
         </section>
 
         <!-- Plotter Form Section -->
@@ -29,7 +20,8 @@
             <h2 class="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
                 Start Plotting
             </h2>
-            <div class="max-w-full mx-auto bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
+            <div
+                class="max-w-full mx-auto bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="md:col-span-3">
                         <input type="text" id="input_lotTitle" v-model="lotTitle" placeholder="Lot title"
@@ -42,25 +34,16 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <multiselect id="input_Tielocation" v-model="tieLoc" placeholder="Select location" 
-                        :options="tieLocOpts" 
-                        :disabled="fieldStates.tieLoc"
-                        :show-labels="false"
-                        ></multiselect>
+                        <multiselect id="input_Tielocation" v-model="tieLoc" placeholder="Select location"
+                            :options="tieLocOpts" :disabled="fieldStates.tieLoc" :show-labels="false"></multiselect>
                     </div>
                     <div>
-                        <multiselect id="input_Tiecity" v-model="tieCity" placeholder="Select location" 
-                        :options="tieCityOpts" 
-                        :disabled="fieldStates.tieCity"
-                        :show-labels="false"
-                        ></multiselect>
+                        <multiselect id="input_Tiecity" v-model="tieCity" placeholder="Select location"
+                            :options="tieCityOpts" :disabled="fieldStates.tieCity" :show-labels="false"></multiselect>
                     </div>
                     <div>
-                        <multiselect id="input_Tiepor" v-model="tiePOR" placeholder="Select location" 
-                        :options="tiePOROpts" 
-                        :disabled="fieldStates.tiePOR"
-                        :show-labels="false"
-                        ></multiselect>
+                        <multiselect id="input_Tiepor" v-model="tiePOR" placeholder="Select location"
+                            :options="tiePOROpts" :disabled="fieldStates.tiePOR" :show-labels="false"></multiselect>
                     </div>
                 </div>
                 <h2 class="block font-semibold text-slate-900 dark:text-white mt-3 mb-3">
@@ -77,20 +60,34 @@
                     </div>
                 </div>
 
-                <div>
-                    <button class="mt-6 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
-                     @click="addNewPlot()">
-                        Add
+                <div class="grid grid-cols-2 gap-4 justify-center mt-6">
+                    <button
+                        class="mx-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
+                        @click="addNewPlot()">
+                        Add Plot
                     </button>
-                    <div v-for="plot in lotitems">
-                        <p>{{ plot.plotname }}</p>
-                        <button class="mt-6 px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
-                        v-if="lotitems.length > 1"
-                        @click="deletePlot(plot.id)">
+                    <button
+                        class="mx-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                        @click="generatePreview()">
+                        Preview Layout
+                    </button>
+                </div>
+                <div v-for="plot in lotitems" class="mx-auto mt-8">
+                    <div class="grid grid-cols-2">
+                        <p class="float-start"><b>{{ plot.plotname }}</b> - <i>Tiepoint: {{ plot.tie.direction }} {{
+                            plot.tie.degree }}° {{ plot.tie.minutes }}' {{ plot.tie.bearing }} {{ plot.tie.distance
+                                }}m</i></p>
+                        <button
+                            class="float-end px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                            v-if="lotitems.length > 1" @click="deletePlot(plot.id)">
                             Delete
                         </button>
                     </div>
+                    <button 
+                        @click="addNewPoint(plot.id)">Add</button>
+                    <Points :plotObj="plot" v-on:removePoint="deletePoint" />
                 </div>
+
             </div>
 
 
@@ -106,7 +103,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Multiselect from 'vue-multiselect';
-import * as mapper from '../mapper.js';
+import * as Mapper from '../mapper.js';
+import Points from './Components/Points.vue';
 
 let lotTitle = ref('');
 let tieLoc = ref('');
@@ -115,12 +113,12 @@ let tiePOR = ref('');
 let tieLatitude = ref('');
 let tieLongitude = ref('');
 
-let tieLocOpts = mapper.tieLocationList;
+let tieLocOpts = Mapper.tieLocationList;
 let tieCityOpts = [];
 let tiePOROpts = [];
 
 let lotitems = ref([]);
-
+defineEmits(['removePoint']);
 
 const fieldStates = computed(() => {
     return {
@@ -135,31 +133,32 @@ const disabledClasses = computed(() => {
 });
 
 const addNewPlot = () => {
-    // Logic to add new lot goes here
-    const newPlot = mapper.createPlotItem(`New Plot`);
+    const newPlot = Mapper.createPlotItem(`New Plot`);
     for (let i = 0; i < 4; i++) {
-        const newPoint = mapper.createPlotPoint();
+        const newPoint = Mapper.createPlotPoint();
         newPlot.points.push(newPoint);
     }
     lotitems.value.push(newPlot);
 };
 
 const deletePlot = (plotId) => {
-    lotitems.value = lotitems.value.filter(plot => plot.id !== plotId);
+    lotitems.value = lotitems.value.filter(p => p.id !== plotId);
 };
 
 const addNewPoint = (plotId) => {
-    const plot = lotitems.value.find(plot => plot.id === plotId);
+    console.log('add point'+plotId)
+    const plot = lotitems.value.find(p => p.id === plotId);
     if (plot) {
-        const newPoint = mapper.createPlotPoint();
+        const newPoint = Mapper.createPlotPoint();
         plot.points.push(newPoint);
     }
 };
 
 const deletePoint = (plotId, pointId) => {
-    const plot = lotitems.value.find(plot => plot.id === plotId);
+    const plot = lotitems.value.find(p => p.id === plotId);
     if (plot) {
-        plot.points = plot.points.filter(point => point.id !== pointId);
+        //console.log('delete point' + JSON.stringify(plot));
+        plot.points = plot.points.filter(p => p.id !== pointId);
     }
 };
 

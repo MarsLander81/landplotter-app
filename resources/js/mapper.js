@@ -2,35 +2,34 @@ const tieLocationList = ['Laguna', 'Cavite', 'Batangas'];
 const tieCityList = ['San Pedro', 'Biñan', 'Santa Rosa'];
 const tiePORList = ['Por 1', 'Por 2', 'Por 3'];
 
-function createPlotItem(plotname) {
+function createPlotItem(plotname, dir, deg, min, bear, dist) {
     return {
-        id: 'PI-' + Date.now(),
+        id: 'PI-' + generateId(),
         plotname: plotname,
-        tieLoc: '',
-        tieCity: '',
-        tiePOR: '',
-        tieLatitude: '',
-        tieLongitude: '',
-        tiedirection: {
-            direction: 'N',
-            degree: 0,
-            minutes: 0,
-            bearing: 'E',
-            distance: 0
+        tie: {
+            direction: dir ?? 'N',
+            degree: deg ?? 0,
+            minutes: min ?? 0,
+            bearing: bear ?? 'E',
+            distance: dist ?? 0
         },
         points: []
     };
 }
 
-function createPlotPoint() {
+function createPlotPoint(dir, deg, min, bear, dist) {
     return {
-        id: 'PPT-' + Date.now(),
-        direction: 'N',
-        degree: 0,
-        minutes: 0,
-        bearing: 'E',
-        distance: 0
+        id: 'PPT-' + generateId(),
+        direction: dir ?? 'N',
+        degree: deg ?? 0,
+        minutes: min ?? 0,
+        bearing: bear ?? 'E',
+        distance: dist ?? 0
     };
+}
+
+function generateId(){
+    return Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
 }
 
 function extrapolatePoints (pointsArray, canvas, padding) {

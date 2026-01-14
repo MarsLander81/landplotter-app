@@ -21,30 +21,30 @@
                 {
                     "Direction": "N",
                     "Degree": 0,
-                    "Minute": 30,
+                    "Minute": 0,
                     "Bearing": "E",
                     "Distance": 150.5
                 },
                 {
                     "Direction": "S",
-                    "Degree": 1,
-                    "Minute": 15,
+                    "Degree": 0,
+                    "Minute": 0,
                     "Bearing": "E",
-                    "Distance": 200
+                    "Distance": 220.1
                 },
                 {
                     "Direction": "S",
                     "Degree": 0,
-                    "Minute": 45,
+                    "Minute": 0,
                     "Bearing": "W",
                     "Distance": 150.5
                 },
                 {
                     "Direction": "N",
-                    "Degree": 1,
-                    "Minute": 15,
+                    "Degree": 0,
+                    "Minute": 0,
                     "Bearing": "W",
-                    "Distance": 200
+                    "Distance": 220.1
                 }
             ]
         },
