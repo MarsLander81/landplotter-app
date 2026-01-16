@@ -63,7 +63,7 @@
                 <div class="grid grid-cols-2 gap-4 justify-center mt-6">
                     <button
                         class="mx-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
-                        @click="addNewPlot()">
+                        @click="addNewPlot()" :disabled="plotMaxLimit(lotitems.length)">
                         Add Plot
                     </button>
                     <button
@@ -76,24 +76,24 @@
                     <div class="grid grid-cols-2">
                         <p class="float-start"><b>{{ plot.plotname }}</b> - <i>Tiepoint: {{ plot.tie.direction }} {{
                             plot.tie.degree }}° {{ plot.tie.minutes }}' {{ plot.tie.bearing }} {{ plot.tie.distance
-                                }}m</i></p>
+                                }}m</i> {{ plot.points.length }} - points</p>
                         <button
                             class="float-end px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
-                            v-if="lotitems.length > 1" @click="deletePlot(plot.id)">
+                            :disabled="plotMinLimit(lotitems.length)" @click="deletePlot(plot.id)">
                             Delete
                         </button>
                     </div>
-                    <button 
-                        @click="addNewPoint(plot.id)">Add</button>
-                    <Points :plotObj="plot" v-on:removePoint="deletePoint" />
+                    <button @click="addNewPoint(plot.id)" :disabled="pointMaxLimit(plot.points.length)">
+                        Add</button>
+                    <Points :plotObj="plot" :pointMinLimit="pointMinLimit" v-on:removePoint="deletePoint" v-on:editPoint="savePoint"/>
                 </div>
 
             </div>
 
 
-            <!--<pre class="text-white">
+            <pre class="text-white">
                 {{ lotitems }}
-            </pre>-->
+            </pre>
         </section>
     </div>
 </template>
@@ -105,6 +105,11 @@ import { ref, computed } from 'vue';
 import Multiselect from 'vue-multiselect';
 import * as Mapper from '../mapper.js';
 import Points from './Components/Points.vue';
+
+let plotMaxLimit = (len) => len >= 6;
+let plotMinLimit = (len) => len <= 1;
+let pointMaxLimit = (len) => len >= 24;
+let pointMinLimit = (len) => len <= 3;
 
 let lotTitle = ref('');
 let tieLoc = ref('');
@@ -132,6 +137,8 @@ const disabledClasses = computed(() => {
     return 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-500';
 });
 
+
+
 const addNewPlot = () => {
     const newPlot = Mapper.createPlotItem(`New Plot`);
     for (let i = 0; i < 4; i++) {
@@ -146,7 +153,7 @@ const deletePlot = (plotId) => {
 };
 
 const addNewPoint = (plotId) => {
-    console.log('add point'+plotId)
+    console.log('add point' + plotId)
     const plot = lotitems.value.find(p => p.id === plotId);
     if (plot) {
         const newPoint = Mapper.createPlotPoint();
@@ -159,6 +166,18 @@ const deletePoint = (plotId, pointId) => {
     if (plot) {
         //console.log('delete point' + JSON.stringify(plot));
         plot.points = plot.points.filter(p => p.id !== pointId);
+    }
+};
+
+const savePoint = (plotId, pointId, updatedPoint) => {
+    const plot = lotitems.value.find(p => p.id === plotId);
+    console.log(plotId);
+    if (plot) {
+        const pointIndex = plot.points.findIndex(p => p.id === pointId);
+        console.log('save point' + pointIndex);
+        if (pointIndex !== -1) {
+            plot.points[pointIndex] = updatedPoint;
+        }
     }
 };
 
