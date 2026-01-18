@@ -1,80 +1,30 @@
 <template>
-    <div class="grid grid-cols-6 gap-4 mt-4 p-4">
-        <div v-for="point in plotObj.points" class="border border-slate-300 dark:border-slate-500 rounded-lg p-4">
-            <div @click="populatePoint(point)">
-                <p class="float-start">P:<i>{{ point.direction }} {{
-                    point.degree }}° {{ point.minutes }}' {{ point.bearing }} {{ point.distance
-                        }}m</i></p>
-                <div class="float-end">
-                    <button :disabled="pointMinLimit(plotObj.points.length)"
-                        @click="$emit('removePoint', plotObj.id, point.id)">Delete</button>
-                </div>
-            </div>
+        <div class="flex gap-1 items-center"><svg xmlns="http://www.w3.org/2000/svg" class="fill-slate-700" width="24" height="24"
+                viewBox="0 0 24 24">
+                <path
+                    d="M8.17 2.76A10.1 10.1 0 0 1 12 2c1.31 0 2.61.26 3.83.76c1.21.5 2.31 1.24 3.24 2.17s1.67 2.03 2.17 3.24c.5 1.22.76 2.52.76 3.83c0 2.65-1.05 5.2-2.93 7.07A9.97 9.97 0 0 1 12 22a10.1 10.1 0 0 1-3.83-.76a10 10 0 0 1-3.24-2.17A9.97 9.97 0 0 1 2 12c0-2.65 1.05-5.2 2.93-7.07c.93-.93 2.03-1.67 3.24-2.17M12 17l1.56-3.42L17 12l-3.44-1.56L12 7l-1.57 3.44L7 12l3.43 1.58z" />
+            </svg><i>{{ pointObj.direction }} {{
+                pointObj.degree }}° {{ pointObj.minutes }}' {{ pointObj.bearing }} {{ pointObj.distance
+                }}m</i>
+
+            <Button class="p-0! bg-transparent! hover:bg-slate-900! rounded-4xl!" :disabled="pointMinLimit(pointLength)"
+                @click="$emit('removePoint', plotId, pointObj.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="fill-slate-900 hover:fill-slate-50" width="24"
+                    height="24" viewBox="0 0 24 24">
+                    <path
+                        d="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12z" />
+                </svg>
+            </Button>
         </div>
-    </div>
-    <div class="grid grid-cols-6">
-        <select id="input_pointDir" v-model="pointArrUpdate.direction"
-            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="N">North</option>
-            <option value="S">South</option>
-        </select>
-        <input type="number" id="input_pointDeg" min="0" max="360" v-model="pointArrUpdate.degree"
-            placeholder="Degree"
-            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-        <input type="number" id="input_pointMin" min="0" max="360" v-model="pointArrUpdate.minutes"
-            placeholder="Minutes"
-            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-        <select id="input_pointBer" v-model="pointArrUpdate.bearing"
-            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="E">East</option>
-            <option value="W">West</option>
-        </select>
-        <input type="number" id="input_pointDist" min="0" v-model="pointArrUpdate.distance" placeholder="Distance"
-            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-        <button @click="editPoint(pointArrUpdate)">Save</button>
-    </div>
 </template>
 <script setup>
 import { ref } from 'vue';
 import * as Mapper from '../../mapper.js';
+import Button from './Button.vue';
 const props = defineProps({
     pointMinLimit: Function,
-    plotObj: Object
+    plotId: String,
+    pointObj: Object,
+    pointLength: Number
 })
-const emit = defineEmits(['removePoint', 'editPoint']);
-
-let plotToUpdate = ref('');
-let pointToUpdate = ref('');
-let pointArrUpdate = ref(buildPoints());
-
-function buildPoints(pointArr = '') {
-    return {
-        direction: pointArr.direction || '',
-        degree: pointArr.degree || 0,
-        minutes: pointArr.minutes || 0,
-        bearing: pointArr.bearing || '',
-        distance: pointArr.distance || 0
-    }
-}
-
-function populatePoint(point) {
-    plotToUpdate.value = props.plotObj.id;
-    pointToUpdate.value = point.id;
-    pointArrUpdate.value = buildPoints(point);
-    console.log(pointArrUpdate.value);
-};
-
-function editPoint(pointArrUpdate) {
-    const updatedPoint = {
-        id: pointToUpdate.value,
-        direction: pointArrUpdate.direction,
-        degree: pointArrUpdate.degree,
-        minutes: pointArrUpdate.minutes,
-        bearing: pointArrUpdate.bearing,
-        distance: pointArrUpdate.distance
-    };
-    emit('editPoint', plotToUpdate.value, pointToUpdate.value, updatedPoint);
-    pointArrUpdate = buildPoints();
-}
-
 </script>

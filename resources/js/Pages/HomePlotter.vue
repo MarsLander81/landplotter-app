@@ -60,37 +60,37 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 justify-center mt-6">
-                    <button
-                        class="mx-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
-                        @click="addNewPlot()" :disabled="plotMaxLimit(lotitems.length)">
-                        Add Plot
-                    </button>
-                    <button
-                        class="mx-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-                        @click="generatePreview()">
-                        Preview Layout
-                    </button>
+                <div class="grid grid-cols-2 gap-4 justify-center mt-6 mb-4">
+                    <Button @click="addNewPlot()" :disabled="plotMaxLimit(lotitems.length)">Add Plot</Button>
+                    <Button @click="generatePreview()">Preview Layout</Button>
                 </div>
-                <div v-for="plot in lotitems" class="mx-auto mt-8">
-                    <div class="grid grid-cols-2">
-                        <p class="float-start"><b>{{ plot.plotname }}</b> - <i>Tiepoint: {{ plot.tie.direction }} {{
-                            plot.tie.degree }}° {{ plot.tie.minutes }}' {{ plot.tie.bearing }} {{ plot.tie.distance
-                                }}m</i> {{ plot.points.length }} - points</p>
-                        <button
-                            class="float-end px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
-                            :disabled="plotMinLimit(lotitems.length)" @click="deletePlot(plot.id)">
-                            Delete
-                        </button>
+
+                <div v-for="plot in lotitems" :key="plot.id"
+                    class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-500 rounded-lg p-4 m-6 ">
+                    <Plots :plot="plot" :plot-min-limit="plotMinLimit" :toggle-object="toggleObject"
+                        :plot-length="lotitems.length" v-on:deletePlot="deletePlot" v-on:collapsePoints="collapsePoints"
+                        @click="selectObject(plot.tie, plot.id)" />
+                    <hr class="my-2" />
+                    <div>
+                        <Button @click="addNewPoint(plot.id)" :disabled="pointMaxLimit(plot.points.length)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M9 11.5A2.5 2.5 0 0 0 11.5 9A2.5 2.5 0 0 0 9 6.5A2.5 2.5 0 0 0 6.5 9A2.5 2.5 0 0 0 9 11.5M9 2c3.86 0 7 3.13 7 7c0 5.25-7 13-7 13S2 14.25 2 9a7 7 0 0 1 7-7m6 15h3v-3h2v3h3v2h-3v3h-2v-3h-3z" />
+                            </svg>
+                        </Button>
+                        <div class="flex flex-wrap m-4">
+                            <div v-for="point in plot.points" :key="point.id"
+                                :class="[toggleObject(point.id, 'point') ? 'bg-blue-400 border border-blue-700' : 'bg-slate-300 hover:bg-slate-400 border border-slate-300']"
+                                class="rounded-4xl m-1 p-1">
+                                <Points :plot-id="plot.id" :point-obj="point" :point-min-limit="pointMinLimit"
+                                    :point-length="plot.points.length" v-on:removePoint="deletePoint"
+                                    @click="selectObject(point, plot.id, point.id)" />
+                            </div>
+                        </div>
                     </div>
-                    <button @click="addNewPoint(plot.id)" :disabled="pointMaxLimit(plot.points.length)">
-                        Add</button>
-                    <Points :plotObj="plot" :pointMinLimit="pointMinLimit" v-on:removePoint="deletePoint" v-on:editPoint="savePoint"/>
                 </div>
-
+                <FieldEditor v-show="selPlotId" :obj-to-edit="objToEdit" class="mt-4 mb-4" />
             </div>
-
-
             <pre class="text-white">
                 {{ lotitems }}
             </pre>
@@ -103,8 +103,11 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Multiselect from 'vue-multiselect';
-import * as Mapper from '../mapper.js';
+import Button from './Components/Button.vue';
+import Plots from './Components/Plots.vue';
 import Points from './Components/Points.vue';
+import FieldEditor from './Components/FieldEditor.vue';
+import * as Mapper from '../mapper.js';
 
 let plotMaxLimit = (len) => len >= 6;
 let plotMinLimit = (len) => len <= 1;
@@ -123,6 +126,10 @@ let tieCityOpts = [];
 let tiePOROpts = [];
 
 let lotitems = ref([]);
+let objToEdit = ref({});
+let selPlotId = ref('');
+let selPointId = ref('');
+
 defineEmits(['removePoint']);
 
 const fieldStates = computed(() => {
@@ -137,7 +144,20 @@ const disabledClasses = computed(() => {
     return 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-500';
 });
 
+const collapsePoints = (id) => {
+    isCollapsed.value = !isCollapsed.value;
+};
 
+const toggleObject = (id, type) =>{
+    return type === 'plot' ? selPlotId.value === id && !selPointId.value : selPointId.value === id
+}
+
+const selectObject = (obj, plid, poid = null) => {
+    objToEdit.value = obj;
+    selPlotId.value = plid;
+    selPointId.value = poid;
+    console.log('selected ' + plid + ' ' + poid);
+};
 
 const addNewPlot = () => {
     const newPlot = Mapper.createPlotItem(`New Plot`);
@@ -169,16 +189,18 @@ const deletePoint = (plotId, pointId) => {
     }
 };
 
-const savePoint = (plotId, pointId, updatedPoint) => {
+const saveObjAdjustments = (plotId, pointId, updatedObj) => {
+    console.log('save adjustments ' + plotId + ' ' + pointId + ' ' + JSON.stringify(updatedObj));
+    /*
     const plot = lotitems.value.find(p => p.id === plotId);
     console.log(plotId);
     if (plot) {
         const pointIndex = plot.points.findIndex(p => p.id === pointId);
         console.log('save point' + pointIndex);
         if (pointIndex !== -1) {
-            plot.points[pointIndex] = updatedPoint;
+            plot.points[pointIndex] = updatedObj;
         }
-    }
+    }*/
 };
 
 addNewPlot();
