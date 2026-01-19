@@ -28,8 +28,16 @@ function createPlotPoint(dir, deg, min, bear, dist) {
     };
 }
 
-function generateId(){
+function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+}
+
+function debounce(fn, delay = 300) {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
 }
 
 function extrapolatePoints (pointsArray, canvas, padding) {
@@ -70,4 +78,4 @@ function extrapolatePoints (pointsArray, canvas, padding) {
     return latLonToCanvas;
 }
 
-export { createPlotItem, createPlotPoint, tieLocationList, tieCityList, tiePORList,  extrapolatePoints };
+export { createPlotItem, createPlotPoint, tieLocationList, tieCityList, tiePORList, debounce, extrapolatePoints };

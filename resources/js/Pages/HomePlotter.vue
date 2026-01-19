@@ -35,15 +35,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <multiselect id="input_Tielocation" v-model="tieLoc" placeholder="Select location"
-                            :options="tieLocOpts" :disabled="fieldStates.tieLoc" :show-labels="false"></multiselect>
+                            track-by="location" label="location" :options="tieLocOpts" :show-labels="false"
+                            @input="onLocInput" :internal-search="false" :loading="isLocLoading"></multiselect>
                     </div>
                     <div>
                         <multiselect id="input_Tiecity" v-model="tieCity" placeholder="Select location"
-                            :options="tieCityOpts" :disabled="fieldStates.tieCity" :show-labels="false"></multiselect>
+                            track-by="city_municipality" label="city_municipality" :options="tieCityOpts" :disabled="fieldStates.tieCity" :show-labels="false"
+                            @input="onCityInput" :internal-search="false" :loading="isCityLoading"></multiselect>
                     </div>
                     <div>
                         <multiselect id="input_Tiepor" v-model="tiePOR" placeholder="Select location"
-                            :options="tiePOROpts" :disabled="fieldStates.tiePOR" :show-labels="false"></multiselect>
+                            track-by="point_of_reference" label="point_of_reference" :options="tiePOROpts" :disabled="fieldStates.tiePOR" :show-labels="false"
+                            @input="onPORInput" :internal-search="false" :loading="isPORLoading" @select="assignTieCoords"></multiselect>
                     </div>
                 </div>
                 <h2 class="block font-semibold text-slate-900 dark:text-white mt-3 mb-3">
@@ -108,6 +111,7 @@ import Plots from './Components/Plots.vue';
 import Points from './Components/Points.vue';
 import FieldEditor from './Components/FieldEditor.vue';
 import * as Mapper from '../mapper.js';
+import axios from 'axios';
 
 let plotMaxLimit = (len) => len >= 6;
 let plotMinLimit = (len) => len <= 1;
@@ -121,9 +125,12 @@ let tiePOR = ref('');
 let tieLatitude = ref('');
 let tieLongitude = ref('');
 
-let tieLocOpts = Mapper.tieLocationList;
-let tieCityOpts = [];
-let tiePOROpts = [];
+let tieLocOpts = ref([]);
+let isLocLoading = ref(false);
+let tieCityOpts = ref([]);
+let isCityLoading = ref(false);
+let tiePOROpts = ref([]);
+let isPORLoading = ref(false);
 
 let lotitems = ref([]);
 let objToEdit = ref({});
@@ -131,24 +138,76 @@ let selPlotId = ref('');
 let selPointId = ref('');
 
 defineEmits(['removePoint']);
-
-const fieldStates = computed(() => {
-    return {
-        tieLoc: tieLocOpts.length === 0,
-        tieCity: tieCityOpts.length === 0,
-        tiePOR: tiePOROpts.length === 0
-    };
-});
+const fieldStates = computed(() => ({
+    tieCity: tieLoc.value.length === 0,
+    tiePOR: tieCity.value.length === 0
+}));
 
 const disabledClasses = computed(() => {
     return 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-500';
 });
 
+const searchData = (apiUrl, dtResult, isLoading) => {
+    return Mapper.debounce(async (value) => {
+        if (value.length < 3) {
+            dtResult([]);
+            return;
+        }
+        try {
+            isLoading(true);
+            const res = await axios.get(apiUrl + value);
+            dtResult(res.data);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            isLoading(false);
+        }
+    }, 500)
+}
+
+const onLocInput = (e) => {
+    const locSearch = searchData(
+        '/api/location?loc=',
+        data => tieLocOpts.value = data,
+        loading => isLocLoading.value = loading
+    );
+    locSearch(e.target.value);
+    tieCity.value = '';
+    tieCityOpts.value = [];
+    tiePOR.value = '';
+    tiePOROpts.value = [];
+}
+
+const onCityInput = (e) => {
+    const citySearch = searchData(
+        '/api/citymun?loc='+tieLoc.value.location+'&citymun=',
+        data => tieCityOpts.value = data,
+        loading => isCityLoading.value = loading
+    );
+    citySearch(e.target.value);
+    tiePOR.value = '';
+    tiePOROpts.value = [];
+}
+
+const onPORInput = (e) => {
+    const porSearch = searchData(
+        '/api/pointreference?loc='+tieLoc.value.location+'&citymun='+tieCity.value.city_municipality+'&pointref=',
+        data => tiePOROpts.value = data,
+        loading => isPORLoading.value = loading
+    );
+    porSearch(e.target.value);
+}
+
+const assignTieCoords = () => {
+    tieLatitude.value = tiePOR.value.latitude ?? '';
+    tieLongitude.value = tiePOR.value.longitude ?? '';
+}
+
 const collapsePoints = (id) => {
     isCollapsed.value = !isCollapsed.value;
 };
 
-const toggleObject = (id, type) =>{
+const toggleObject = (id, type) => {
     return type === 'plot' ? selPlotId.value === id && !selPointId.value : selPointId.value === id
 }
 
@@ -189,19 +248,6 @@ const deletePoint = (plotId, pointId) => {
     }
 };
 
-const saveObjAdjustments = (plotId, pointId, updatedObj) => {
-    console.log('save adjustments ' + plotId + ' ' + pointId + ' ' + JSON.stringify(updatedObj));
-    /*
-    const plot = lotitems.value.find(p => p.id === plotId);
-    console.log(plotId);
-    if (plot) {
-        const pointIndex = plot.points.findIndex(p => p.id === pointId);
-        console.log('save point' + pointIndex);
-        if (pointIndex !== -1) {
-            plot.points[pointIndex] = updatedObj;
-        }
-    }*/
-};
 
 addNewPlot();
 </script>
