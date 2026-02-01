@@ -1,8 +1,15 @@
 <template>
     <div class="grid grid-cols-2 items-center mt-2 mb-4">
         <div class="flex text-xl rounded-4xl font-medium text-slate-900 items-center">
-            <b>{{ plot.plotname }}</b>
+            <div>
+                <b v-show="!plot?.editing" @dblclick="setPlotEditing(plot)">{{ plot.plotname }}</b>
+                <input :key="plot.id" type="text" :id="plot.id" v-model="plot.plotname"
+                @blur="setPlotEditing(plot)"
+                v-show="plot?.editing"
+                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
             <div class="mx-4 p-2 rounded-2xl flex items-center"
+                @click="$emit('selectPlot', plot.tie, plot.id)"
                 :class="[toggleObject(plot.id, 'plot') ? 'bg-blue-400 border border-blue-700' : 'bg-slate-300 hover:bg-slate-400 border border-slate-300']">
                 <svg xmlns="http://www.w3.org/2000/svg" class="fill-slate-700" width="24" height="24"
                     viewBox="0 0 24 24">
@@ -28,7 +35,7 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import Button from './Button.vue';
 
 const props = defineProps({
@@ -37,4 +44,13 @@ const props = defineProps({
     plot: Object,
     plotLength: Number,
 })
+
+const titleEditing = ref(false);
+const setPlotEditing = async (plot, state) => {
+  plot.editing = (typeof state === "boolean") ? state : !plot.editing;
+  if (plot.editing){
+    await nextTick();
+    document.getElementById(plot.id).focus();
+  }
+};
 </script>

@@ -17,7 +17,9 @@
     "dependencies": {
         "@inertiajs/vue3": "^2.3.7",
         "@vitejs/plugin-vue": "^6.0.3",
+        "konva": "^10.2.0",
         "vue": "^3.5.26",
+        "vue-konva": "^3.3.0",
         "vue-multiselect": "^3.4.0"
     }
 }

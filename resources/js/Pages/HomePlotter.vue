@@ -1,11 +1,10 @@
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../../css/multiselect.css"></style>
 <template>
-
-    <Head title="Welcome | Land Plotter" />
+    <Head title="Land Plotter" />
     <div>
         <!-- Hero Section -->
-        <section class="text-center py-20">
+        <section class="text-center py-8">
             <h1 class="text-5xl font-bold text-slate-900 dark:text-white mb-6">
                 Welcome to Land Plotter
             </h1>
@@ -16,8 +15,8 @@
         </section>
 
         <!-- Plotter Form Section -->
-        <section id="plotter" class="py-12">
-            <h2 class="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
+        <section id="plotter" class="py-6">
+            <h2 class="text-3xl font-bold text-center text-slate-900 dark:text-white mb-6">
                 Start Plotting
             </h2>
             <div
@@ -40,13 +39,15 @@
                     </div>
                     <div>
                         <multiselect id="input_Tiecity" v-model="tieCity" placeholder="Select location"
-                            track-by="city_municipality" label="city_municipality" :options="tieCityOpts" :disabled="fieldStates.tieCity" :show-labels="false"
-                            @input="onCityInput" :internal-search="false" :loading="isCityLoading"></multiselect>
+                            track-by="city_municipality" label="city_municipality" :options="tieCityOpts"
+                            :disabled="fieldStates.tieCity" :show-labels="false" @input="onCityInput"
+                            :internal-search="false" :loading="isCityLoading"></multiselect>
                     </div>
                     <div>
                         <multiselect id="input_Tiepor" v-model="tiePOR" placeholder="Select location"
-                            track-by="point_of_reference" label="point_of_reference" :options="tiePOROpts" :disabled="fieldStates.tiePOR" :show-labels="false"
-                            @input="onPORInput" :internal-search="false" :loading="isPORLoading" @select="assignTieCoords"></multiselect>
+                            track-by="point_of_reference" label="point_of_reference" :options="tiePOROpts"
+                            :disabled="fieldStates.tiePOR" :show-labels="false" @input="onPORInput"
+                            :internal-search="false" :loading="isPORLoading" @select="assignTieCoords"></multiselect>
                     </div>
                 </div>
                 <h2 class="block font-semibold text-slate-900 dark:text-white mt-3 mb-3">
@@ -65,14 +66,14 @@
 
                 <div class="grid grid-cols-2 gap-4 justify-center mt-6 mb-4">
                     <Button @click="addNewPlot()" :disabled="plotMaxLimit(lotitems.length)">Add Plot</Button>
-                    <Button @click="generatePreview()">Preview Layout</Button>
+                    <Button @click="submit" :disabled="form.processing">View Layout</Button>
                 </div>
 
                 <div v-for="plot in lotitems" :key="plot.id"
                     class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-500 rounded-lg p-4 m-6 ">
                     <Plots :plot="plot" :plot-min-limit="plotMinLimit" :toggle-object="toggleObject"
                         :plot-length="lotitems.length" v-on:deletePlot="deletePlot" v-on:collapsePoints="collapsePoints"
-                        @click="selectObject(plot.tie, plot.id)" />
+                        v-on:selectPlot="selectObject" />
                     <hr class="my-2" />
                     <div>
                         <Button @click="addNewPoint(plot.id)" :disabled="pointMaxLimit(plot.points.length)">
@@ -92,7 +93,7 @@
                         </div>
                     </div>
                 </div>
-                <FieldEditor v-show="selPlotId" :obj-to-edit="objToEdit" class="mt-4 mb-4" />
+                <FieldEditor v-show="hasToggled" :obj-to-edit="objToEdit" class="mt-4 mb-4" />
             </div>
             <pre class="text-white">
                 {{ lotitems }}
@@ -103,7 +104,7 @@
 
 
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Multiselect from 'vue-multiselect';
 import Button from './Components/Button.vue';
@@ -136,6 +137,7 @@ let lotitems = ref([]);
 let objToEdit = ref({});
 let selPlotId = ref('');
 let selPointId = ref('');
+const hasToggled = ref(false);
 
 defineEmits(['removePoint']);
 const fieldStates = computed(() => ({
@@ -180,7 +182,7 @@ const onLocInput = (e) => {
 
 const onCityInput = (e) => {
     const citySearch = searchData(
-        '/api/citymun?loc='+tieLoc.value.location+'&citymun=',
+        '/api/citymun?loc=' + tieLoc.value.location + '&citymun=',
         data => tieCityOpts.value = data,
         loading => isCityLoading.value = loading
     );
@@ -191,7 +193,7 @@ const onCityInput = (e) => {
 
 const onPORInput = (e) => {
     const porSearch = searchData(
-        '/api/pointreference?loc='+tieLoc.value.location+'&citymun='+tieCity.value.city_municipality+'&pointref=',
+        '/api/pointreference?loc=' + tieLoc.value.location + '&citymun=' + tieCity.value.city_municipality + '&pointref=',
         data => tiePOROpts.value = data,
         loading => isPORLoading.value = loading
     );
@@ -208,14 +210,21 @@ const collapsePoints = (id) => {
 };
 
 const toggleObject = (id, type) => {
-    return type === 'plot' ? selPlotId.value === id && !selPointId.value : selPointId.value === id
+    return type === 'plot' ? selPlotId.value === id && !selPointId.value : selPointId.value === id;
+}
+
+const unToggleSelected = () => {
+    objToEdit.value = {};
+    selPlotId.value = '';
+    selPointId.value = '';
+    hasToggled.value = false;
 }
 
 const selectObject = (obj, plid, poid = null) => {
     objToEdit.value = obj;
     selPlotId.value = plid;
     selPointId.value = poid;
-    console.log('selected ' + plid + ' ' + poid);
+    hasToggled.value = true;
 };
 
 const addNewPlot = () => {
@@ -247,6 +256,13 @@ const deletePoint = (plotId, pointId) => {
         plot.points = plot.points.filter(p => p.id !== pointId);
     }
 };
+const lotForms = useForm({
+    items: lotitems.value
+});
+
+const submit = () => {
+    lotForms.post(route('lot_submit'))
+}
 
 
 addNewPlot();

@@ -9,7 +9,7 @@ class PlotterController extends Controller
     public function plotLand(Request $request){
         $lotJsonData = $request->input();
         $output = $this->outputCoords($lotJsonData);
-        return response()->json($output);
+        return redirect()->route('plot-view')->with('lot_data', $output);
     }
     private function bearingToDegree($direction, $degree){
         switch($direction){

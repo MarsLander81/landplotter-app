@@ -11,4 +11,9 @@ class PageController extends Controller
     {
         return Inertia::render('HomePlotter');
     }
+
+    public function plotView()
+    {
+        return Inertia::render('ViewPlotter');
+    }
 }
