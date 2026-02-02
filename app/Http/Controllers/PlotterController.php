@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PlotterController extends Controller
 {
     public function plotLand(Request $request){
         $lotJsonData = $request->input();
         $output = $this->outputCoords($lotJsonData);
-        return redirect()->route('plot-view')->with('lot_data', $output);
+        //return redirect()->route('plot-view')->with('lot_data', $lotJsonData);
+        return Inertia::render('ViewPlotter',['plotRenderData' => $output]);
     }
     private function bearingToDegree($direction, $degree){
         switch($direction){
@@ -72,7 +74,7 @@ class PlotterController extends Controller
     private function informationBuilder($lotNumber, $direction, $angle, $minutes, $bearing, $distance){
         return [
             'Line' => $lotNumber,
-            'Bearing' => $direction.' '.$angle.'° '.$minutes."\' ".$bearing,
+            'Bearing' => $direction.' '.$angle.'° '.$minutes."' ".$bearing,
             'Distance' => $distance
         ];
     }
@@ -80,50 +82,53 @@ class PlotterController extends Controller
     public function outputCoords($lotJsonData){
         $fullLotInfo = [];
         $allDistances = [];
+        
+        $lotTieData = $lotJsonData['tiePoint'];
+        $tieLocation = (!empty($lotTieData['tieLoc']) && !empty($lotTieData['tieCity']) && !empty($lotTieData['tieRef']))
+        ? $lotTieData['tieLoc'].', '.$lotTieData['tieCity'].', '.$lotTieData['tieRef']
+        : $lotJsonData['lotAddress']. ' - ' .$lotTieData['tieLatitude'].', '.$lotTieData['tieLongitude'];
 
-        $lotAddress = $lotJsonData['Address'] || 'N/A';
-        $tieLocation = $lotJsonData['Province'].', '.$lotJsonData['City'].', '.$lotJsonData['PointOfReference'] ?? $tieLocation = $lotJsonData['Tie Point']['Latitude'].', '.$lotJsonData['Tie Point']['Longitude'];
+        $mLatitude = $lotTieData['tieLatitude'] ?? 0;
+        $mLongitude = $lotTieData['tieLongitude'] ?? 0;
 
-        $mLatitude = $lotJsonData['TiePoint']['Latitude'] ?? 0;
-        $mLongitude = $lotJsonData['TiePoint']['Longitude'] ?? 0;
-
-        foreach ($lotJsonData['LotItem'] as $lot) {
-            $allDistances = array_merge($allDistances, array_column($lot['LotCoordinates'], 'Distance'));
+        foreach ($lotJsonData['lotItem'] as $lot) {
+            $allDistances = array_merge($allDistances, array_column($lot['points'], 'Distance'));
         }
         $maxDistancePoint = !empty($allDistances) ? max($allDistances) : 1; //max distance for scaling
 
-        foreach($lotJsonData['LotItem'] as $i => $lotItem){
+        foreach($lotJsonData['lotItem'] as $i => $lotItem){
             $lotInfo = [];
-
-            $tieAngle = $this->bearingToDegree($lotItem['TieDirection'].$lotItem['TieBearing'], $lotItem['TieDegree'] + ($lotItem['TieMinute'] / 60));
-            $tieMapCoord = $this->destinationPoint($lotItem['TieDistance'], $tieAngle, $mLongitude, $mLatitude);
+            
+            $tieInfo = $lotItem['tie'];
+            $tieAngle = $this->bearingToDegree($tieInfo['direction'].$tieInfo['bearing'], $tieInfo['degree'] + ($tieInfo['minutes'] / 60));
+            $tieMapCoord = $this->destinationPoint($tieInfo['distance'], $tieAngle, $mLongitude, $mLatitude);
 
             $pLon = $tieMapCoord[0];
             $pLat = $tieMapCoord[1];
 
             $lotInfo = [
-                "LotName" => $lotItem['LotName'] ?? 'Lot '.($i+1),
-                "TieDirection" => $this->informationBuilder('Tie Point', $lotItem['TieDirection'], $lotItem['TieDegree'], $lotItem['TieMinute'], $lotItem['TieBearing'], $lotItem['TieDistance']),
-                "EndPoint" => [
-                    "Latitude" => round($pLat,6),
-                    "Longitude" => round($pLon,6)
+                "plotName" => $lotItem['plotname'] ?? 'Plot '.($i+1),
+                "tieLabel" => $this->informationBuilder('Tie Point', $tieInfo['direction'], $tieInfo['degree'], $tieInfo['minutes'], $tieInfo['bearing'], $tieInfo['distance']),
+                "endPoint" => [
+                    "latitude" => round($pLat,6),
+                    "longitude" => round($pLon,6)
                 ],
-                "LotPoints" => []
+                "points" => []
             ];
                 
             //Mapping Full Body Coordinates
-            foreach($lotItem['LotCoordinates'] as $j => $pointItem){
-                $pointAngle = $this->bearingToDegree($pointItem['Direction'].$pointItem['Bearing'], $pointItem['Degree'] + ($pointItem['Minute'] / 60));
-                $pointMapCoord = $this->destinationPoint($pointItem['Distance'], $pointAngle, $tieMapCoord[0], $tieMapCoord[1]);
+            foreach($lotItem['points'] as $j => $pointItem){
+                $pointAngle = $this->bearingToDegree($pointItem['direction'].$pointItem['bearing'], $pointItem['degree'] + ($pointItem['minutes'] / 60));
+                $pointMapCoord = $this->destinationPoint($pointItem['distance'], $pointAngle, $tieMapCoord[0], $tieMapCoord[1]);
     
                 $lotPointInfo = [
-                    "PointNumber" => $j + 1,
-                    "Direction" => $this->informationBuilder('Line '.($j+1), $pointItem['Direction'], $pointItem['Degree'], $pointItem['Minute'], $pointItem['Bearing'], $pointItem['Distance']),
-                    "Latitude" => round($pLat,6),
-                    "Longitude" => round($pLon,6),
-                    "Distance" => $pointItem['Distance']
+                    "pointNumber" => $j + 1,
+                    "pointLabel" => $this->informationBuilder('Line '.($j+1), $pointItem['direction'], $pointItem['degree'], $pointItem['minutes'], $pointItem['bearing'], $pointItem['distance']),
+                    "latitude" => round($pLat,6),
+                    "longitude" => round($pLon,6),
+                    "distance" => $pointItem['distance']
                 ];
-                array_push($lotInfo['LotPoints'], $lotPointInfo);
+                array_push($lotInfo['points'], $lotPointInfo);
 
                 $pLon = $pointMapCoord[0];
                 $pLat = $pointMapCoord[1];
@@ -132,17 +137,18 @@ class PlotterController extends Controller
         }
 
         $mainArr = [
-            "Lot Title" => $lotJsonData['Lot Title'] ?? 'N/A',
-            "Address" => $lotAddress,
-            "Province" => $lotJsonData['Province'] ?? 'N/A',
-            "City" => $lotJsonData['City'] ?? 'N/A',
-            "TiePoint" => [
-                "Location" => $tieLocation,
-                "Latitude" => round($mLatitude,6),
-                "Longitude" => round($mLongitude,6)
+            "lotTitle" => $lotJsonData['lotTitle'] ?? 'N/A',
+            "lotAddress" => $lotJsonData['lotAddress'],
+            "tiePoint" => [
+                "tieLoc" => $lotTieData['tieLoc'] ?? 'N/A',
+                "tieCity" => $lotTieData['tieCity'] ?? 'N/A',
+                "tieRef" => $lotTieData['tieRef'] ?? 'N/A',
+                "tieLabel" => $tieLocation,
+                "tieLatitude" => round($mLatitude,6),
+                "tieLongitude" => round($mLongitude,6)
             ],
-            "LotCoordinates" => $fullLotInfo,
-            "MaxDistancePoint" => $maxDistancePoint
+            "lotItem" => $fullLotInfo,
+            "maxDistancePoint" => $maxDistancePoint
         ];
         
         return $mainArr;

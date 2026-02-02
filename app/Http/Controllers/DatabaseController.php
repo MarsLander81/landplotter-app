@@ -10,7 +10,7 @@ class DatabaseController extends Controller
 {
     public function fetchLocation(Request $request){
         $queryLocation = trim($request->loc);
-        if (!$queryLocation || strlen($queryLocation) < 3) {
+        if (!$queryLocation || strlen($queryLocation) < 2) {
             return [];
         }
         return TiePoints::query()
@@ -24,7 +24,7 @@ class DatabaseController extends Controller
     public function fetchCityMun(Request $request){
         $queryLocation = trim($request->loc);
         $queryCityMun = trim($request->citymun);
-        if (!$queryCityMun || strlen($queryCityMun) < 3) {
+        if (!$queryCityMun || strlen($queryCityMun) < 2) {
             return [];
         }
         return TiePoints::query()
@@ -40,7 +40,7 @@ class DatabaseController extends Controller
         $queryLocation = trim($request->loc);
         $queryCityMun = trim($request->citymun);
         $queryPointReference = trim($request->pointref);
-        if (!$queryPointReference || strlen($queryPointReference) < 3) {
+        if (!$queryPointReference || strlen($queryPointReference) < 2) {
             return [];
         }
         return TiePoints::query()

@@ -21,9 +21,13 @@
             </h2>
             <div
                 class="max-w-full mx-auto bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="md:col-span-3">
-                        <input type="text" id="input_lotTitle" v-model="lotTitle" placeholder="Lot title"
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <input type="text" id="input_lotTitle" v-model="lotDetails.lotTitle" placeholder="Lot title"
+                            class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div>
+                        <input type="text" id="input_lotAddress" v-model="lotDetails.lotAddress" placeholder="Lot Address"
                             class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                     </div>
                 </div>
@@ -55,24 +59,24 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <input type="text" id="input_TieLatitude" v-model="tieLatitude" placeholder="Latitude"
+                        <input type="text" id="input_TieLatitude" v-model="lotDetails.tiePoint.tieLatitude" placeholder="Latitude"
                             class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                     </div>
                     <div>
-                        <input type="text" id="input_TieLongitude" v-model="tieLongitude" placeholder="Longitude"
+                        <input type="text" id="input_TieLongitude" v-model="lotDetails.tiePoint.tieLongitude" placeholder="Longitude"
                             class="w-full px-4 py-2 border border-slate-300 dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 justify-center mt-6 mb-4">
-                    <Button @click="addNewPlot()" :disabled="plotMaxLimit(lotitems.length)">Add Plot</Button>
-                    <Button @click="submit" :disabled="form.processing">View Layout</Button>
+                    <Button @click="addNewPlot()" :disabled="plotMaxLimit(lotItems.length)">Add Plot</Button>
+                    <Button @click="submit" :disabled="lotDetails.processing">View Layout</Button>
                 </div>
 
-                <div v-for="plot in lotitems" :key="plot.id"
+                <div v-for="plot in lotItems" :key="plot.id"
                     class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-500 rounded-lg p-4 m-6 ">
                     <Plots :plot="plot" :plot-min-limit="plotMinLimit" :toggle-object="toggleObject"
-                        :plot-length="lotitems.length" v-on:deletePlot="deletePlot" v-on:collapsePoints="collapsePoints"
+                        :plot-length="lotItems.length" v-on:deletePlot="deletePlot" v-on:collapsePoints="collapsePoints"
                         v-on:selectPlot="selectObject" />
                     <hr class="my-2" />
                     <div>
@@ -96,7 +100,7 @@
                 <FieldEditor v-show="hasToggled" :obj-to-edit="objToEdit" class="mt-4 mb-4" />
             </div>
             <pre class="text-white">
-                {{ lotitems }}
+                {{ lotDetails }}
             </pre>
         </section>
     </div>
@@ -113,18 +117,22 @@ import Points from './Components/Points.vue';
 import FieldEditor from './Components/FieldEditor.vue';
 import * as Mapper from '../mapper.js';
 import axios from 'axios';
+import { router } from '@inertiajs/vue3';
 
 let plotMaxLimit = (len) => len >= 6;
 let plotMinLimit = (len) => len <= 1;
 let pointMaxLimit = (len) => len >= 24;
 let pointMinLimit = (len) => len <= 3;
 
-let lotTitle = ref('');
-let tieLoc = ref('');
+let lotDetails = useForm({
+    lotTitle:'',
+    lotAddress:'',
+    tiePoint:{},
+    lotItem:[]
+});
+let tieLoc = ref('');;
 let tieCity = ref('');
 let tiePOR = ref('');
-let tieLatitude = ref('');
-let tieLongitude = ref('');
 
 let tieLocOpts = ref([]);
 let isLocLoading = ref(false);
@@ -133,7 +141,7 @@ let isCityLoading = ref(false);
 let tiePOROpts = ref([]);
 let isPORLoading = ref(false);
 
-let lotitems = ref([]);
+let lotItems = ref([]);
 let objToEdit = ref({});
 let selPlotId = ref('');
 let selPointId = ref('');
@@ -151,7 +159,7 @@ const disabledClasses = computed(() => {
 
 const searchData = (apiUrl, dtResult, isLoading) => {
     return Mapper.debounce(async (value) => {
-        if (value.length < 3) {
+        if (value.length < 2) {
             dtResult([]);
             return;
         }
@@ -201,9 +209,15 @@ const onPORInput = (e) => {
 }
 
 const assignTieCoords = () => {
-    tieLatitude.value = tiePOR.value.latitude ?? '';
-    tieLongitude.value = tiePOR.value.longitude ?? '';
-}
+  const tiePoint = lotDetails.tiePoint;
+  const por = tiePOR.value;
+
+  tiePoint.tieLoc = tieLoc.value.location ?? '';
+  tiePoint.tieCity = tieCity.value.city_municipality ?? '';
+  tiePoint.tieRef = por.point_of_reference ?? '';
+  tiePoint.tieLatitude = por.latitude ?? '';
+  tiePoint.tieLongitude = por.longitude ?? '';
+};
 
 const collapsePoints = (id) => {
     isCollapsed.value = !isCollapsed.value;
@@ -233,16 +247,16 @@ const addNewPlot = () => {
         const newPoint = Mapper.createPlotPoint();
         newPlot.points.push(newPoint);
     }
-    lotitems.value.push(newPlot);
+    lotItems.value.push(newPlot);
 };
 
 const deletePlot = (plotId) => {
-    lotitems.value = lotitems.value.filter(p => p.id !== plotId);
+    lotItems.value = lotItems.value.filter(p => p.id !== plotId);
 };
 
 const addNewPoint = (plotId) => {
     console.log('add point' + plotId)
-    const plot = lotitems.value.find(p => p.id === plotId);
+    const plot = lotItems.value.find(p => p.id === plotId);
     if (plot) {
         const newPoint = Mapper.createPlotPoint();
         plot.points.push(newPoint);
@@ -250,20 +264,17 @@ const addNewPoint = (plotId) => {
 };
 
 const deletePoint = (plotId, pointId) => {
-    const plot = lotitems.value.find(p => p.id === plotId);
+    const plot = lotItems.value.find(p => p.id === plotId);
     if (plot) {
         //console.log('delete point' + JSON.stringify(plot));
         plot.points = plot.points.filter(p => p.id !== pointId);
     }
 };
-const lotForms = useForm({
-    items: lotitems.value
-});
 
 const submit = () => {
-    lotForms.post(route('lot_submit'))
+    lotDetails.lotItem = [...lotItems.value];
+    lotDetails.post('/lot-submit');
 }
-
 
 addNewPlot();
 </script>

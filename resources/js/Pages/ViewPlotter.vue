@@ -6,11 +6,20 @@
                 Plotter Details
             </h1>
         </section>
-
         <!-- Plotter Form Section -->
         <section id="plotter-details" class="grid grid-cols-2 py-6">
+            <pre>{{ props.plotRenderData }}</pre>
             <!-- Canvas -->
             <!-- Summary/Editor-->
         </section>
     </div>
 </template>
+<script setup>
+import { ref } from 'vue';
+const props = defineProps({
+    plotRenderData: {
+        type: [Object, Array],
+        required: true,
+    }
+})
+</script>
