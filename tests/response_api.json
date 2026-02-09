@@ -1,73 +1,68 @@
-{
-  "lotTitle": "Fra",
-  "lotAddress": "27 Addr Calamba Laguna",
-  "tiePoint": {
-    "tieLoc": "N/A",
-    "tieCity": "N/A",
-    "tieRef": "N/A",
-    "tieLabel": "27 Addr Calamba Laguna - 14.59486866, 121.16590881",
-    "tieLatitude": 14.594869,
-    "tieLongitude": 121.165909
-  },
-  "lotItem": [
-    {
-      "plotName": "New Plot",
-      "tieLabel": {
-        "Line": "Tie Point",
-        "Bearing": "N 0° 0' E",
-        "Distance": 0
+[
+  {
+    "plotName": "New Plot",
+    "tieLabel": {
+      "Line": "Tie Point",
+      "Bearing": "N 35° 0' E",
+      "Distance": 1250
+    },
+    "endPoint": {
+      "latitude": 14.183258,
+      "longitude": 121.158201
+    },
+    "points": [
+      {
+        "pointId": "PPT-mlf79sb7drk",
+        "pointNumber": 1,
+        "pointLabel": {
+          "Line": "Line 1",
+          "Bearing": "N 35° 0' E",
+          "Distance": 30
+        },
+        "latitude": 14.183479,
+        "longitude": 121.158361,
+        "canvasX": 10,
+        "canvasY": 35.28063204566763
       },
-      "endPoint": {
-        "latitude": 14.594869,
-        "longitude": 121.165909
+      {
+        "pointId": "PPT-mlf79sb7y3d",
+        "pointNumber": 2,
+        "pointLabel": {
+          "Line": "Line 2",
+          "Bearing": "S 90° 0' E",
+          "Distance": 75
+        },
+        "latitude": 14.183479,
+        "longitude": 121.159057,
+        "canvasX": 390,
+        "canvasY": 35.28063204566763
       },
-      "points": [
-        {
-          "pointNumber": 1,
-          "pointLabel": {
-            "Line": "Line 1",
-            "Bearing": "N 0° 0' E",
-            "Distance": 0
-          },
-          "latitude": 14.594869,
-          "longitude": 121.165909,
-          "distance": 0
+      {
+        "pointId": "PPT-mlf79sb7430",
+        "pointNumber": 3,
+        "pointLabel": {
+          "Line": "Line 3",
+          "Bearing": "N 180° 0' W",
+          "Distance": 65
         },
-        {
-          "pointNumber": 2,
-          "pointLabel": {
-            "Line": "Line 2",
-            "Bearing": "N 0° 0' E",
-            "Distance": 0
-          },
-          "latitude": 14.594869,
-          "longitude": 121.165909,
-          "distance": 0
+        "latitude": 14.182894,
+        "longitude": 121.159057,
+        "canvasX": 390,
+        "canvasY": 364.71936795433237
+      },
+      {
+        "pointId": "PPT-mlf79sb72wc",
+        "pointNumber": 4,
+        "pointLabel": {
+          "Line": "Line 4",
+          "Bearing": "N 10° 10' W",
+          "Distance": 35
         },
-        {
-          "pointNumber": 3,
-          "pointLabel": {
-            "Line": "Line 3",
-            "Bearing": "N 0° 0' E",
-            "Distance": 0
-          },
-          "latitude": 14.594869,
-          "longitude": 121.165909,
-          "distance": 0
-        },
-        {
-          "pointNumber": 4,
-          "pointLabel": {
-            "Line": "Line 4",
-            "Bearing": "N 0° 0' E",
-            "Distance": 0
-          },
-          "latitude": 14.594869,
-          "longitude": 121.165909,
-          "distance": 0
-        }
-      ]
-    }
-  ],
-  "maxDistancePoint": 1
-}
+        "latitude": 14.183204,
+        "longitude": 121.159,
+        "canvasX": 358.87931034603156,
+        "canvasY": 190.14499507954417
+      }
+    ]
+  }
+]

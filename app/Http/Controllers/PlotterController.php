@@ -118,15 +118,23 @@ class PlotterController extends Controller
                 
             //Mapping Full Body Coordinates
             foreach($lotItem['points'] as $j => $pointItem){
-                $pointAngle = $this->bearingToDegree($pointItem['direction'].$pointItem['bearing'], $pointItem['degree'] + ($pointItem['minutes'] / 60));
-                $pointMapCoord = $this->destinationPoint($pointItem['distance'], $pointAngle, $tieMapCoord[0], $tieMapCoord[1]);
+                $pointAngle = $this->bearingToDegree(
+                    $pointItem['direction'].$pointItem['bearing'], 
+                    $pointItem['degree'] + ($pointItem['minutes'] / 60
+                ));
+                $pointMapCoord = $this->destinationPoint(
+                    $pointItem['distance'], 
+                    $pointAngle, 
+                    $pLon, 
+                    $pLat
+                );
     
                 $lotPointInfo = [
+                    "pointId"=> $pointItem['id'],
                     "pointNumber" => $j + 1,
                     "pointLabel" => $this->informationBuilder('Line '.($j+1), $pointItem['direction'], $pointItem['degree'], $pointItem['minutes'], $pointItem['bearing'], $pointItem['distance']),
-                    "latitude" => round($pLat,6),
-                    "longitude" => round($pLon,6),
-                    "distance" => $pointItem['distance']
+                    "latitude" => round($pointMapCoord[1],6),
+                    "longitude" => round($pointMapCoord[0],6),
                 ];
                 array_push($lotInfo['points'], $lotPointInfo);
 
