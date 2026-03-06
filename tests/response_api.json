@@ -3,65 +3,65 @@
     "plotName": "New Plot",
     "tieLabel": {
       "Line": "Tie Point",
-      "Bearing": "N 35° 0' E",
-      "Distance": 1250
+      "Bearing": "N 0° 0' E",
+      "Distance": 0
     },
     "endPoint": {
-      "latitude": 14.183258,
-      "longitude": 121.158201
+      "latitude": 14.174809,
+      "longitude": 121.151123
     },
     "points": [
       {
-        "pointId": "PPT-mlf79sb7drk",
+        "pointId": "PPT-mlf7hyayaii",
         "pointNumber": 1,
         "pointLabel": {
           "Line": "Line 1",
-          "Bearing": "N 35° 0' E",
-          "Distance": 30
+          "Bearing": "N 90° 0' E",
+          "Distance": 10
         },
-        "latitude": 14.183479,
-        "longitude": 121.158361,
-        "canvasX": 10,
-        "canvasY": 35.28063204566763
+        "latitude": 14.174809,
+        "longitude": 121.151216,
+        "canvasX": "390.00",
+        "canvasY": "263.44"
       },
       {
-        "pointId": "PPT-mlf79sb7y3d",
+        "pointId": "PPT-mlf7hyayi0v",
         "pointNumber": 2,
         "pointLabel": {
           "Line": "Line 2",
-          "Bearing": "S 90° 0' E",
-          "Distance": 75
+          "Bearing": "S 180° 0' E",
+          "Distance": 5
         },
-        "latitude": 14.183479,
-        "longitude": 121.159057,
-        "canvasX": 390,
-        "canvasY": 35.28063204566763
+        "latitude": 14.174854,
+        "longitude": 121.151216,
+        "canvasX": "390.00",
+        "canvasY": "136.56"
       },
       {
-        "pointId": "PPT-mlf79sb7430",
+        "pointId": "PPT-mlf7hyayfou",
         "pointNumber": 3,
         "pointLabel": {
           "Line": "Line 3",
-          "Bearing": "N 180° 0' W",
-          "Distance": 65
+          "Bearing": "S 90° 0' W",
+          "Distance": 5
         },
-        "latitude": 14.182894,
-        "longitude": 121.159057,
-        "canvasX": 390,
-        "canvasY": 364.71936795433237
+        "latitude": 14.174854,
+        "longitude": 121.15117,
+        "canvasX": "264.24",
+        "canvasY": "136.56"
       },
       {
-        "pointId": "PPT-mlf79sb72wc",
+        "pointId": "PPT-mlf7hyayzk4",
         "pointNumber": 4,
         "pointLabel": {
           "Line": "Line 4",
-          "Bearing": "N 10° 10' W",
-          "Distance": 35
+          "Bearing": "N 90° 0' W",
+          "Distance": 10
         },
-        "latitude": 14.183204,
-        "longitude": 121.159,
-        "canvasX": 358.87931034603156,
-        "canvasY": 190.14499507954417
+        "latitude": 14.174854,
+        "longitude": 121.151077,
+        "canvasX": "10.00",
+        "canvasY": "136.56"
       }
     ]
   }

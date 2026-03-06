@@ -40,7 +40,7 @@ function debounce(fn, delay = 300) {
     };
 }
 
-function extrapolatePoints (pointsArray, canvas, padding = 10) {
+function extrapolatePoints (pointsArray, canvas, padding = 25) {
     let latitudes = pointsArray.map(pt => pt.latitude);
     let longitudes = pointsArray.map(pt => pt.longitude);
 

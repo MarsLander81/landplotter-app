@@ -7,6 +7,7 @@ use Inertia\Inertia;
 
 class PlotterController extends Controller
 {
+    private static $R = 6371e3; // Earth's radius in metres
     public function plotLand(Request $request){
         $lotJsonData = $request->input();
         $output = $this->outputCoords($lotJsonData);
@@ -30,20 +31,19 @@ class PlotterController extends Controller
 
     // Convert degree format to bearing format
     private function degreeToBearing($degree){
-        $direction = 'N';
-        $bearing = 'E';
 
-        if(abs($degree) > 90) $direction = 'S';
-        if($degree < 0) $bearing = 'W';
-
-        if($direction == 'S' && $bearing == 'E'){
-            $convertedDegree = $degree + 180 - 360;
-        } elseif($direction == 'S' && $bearing == 'W'){
-            $convertedDegree = $degree - 180;
+        if(abs($degree) <= 90){
+            $direction = 'N';
+            $angle = abs($degree);
         }else{
-            $convertedDegree = $degree;
+            $direction = 'S';
+            $angle = 180 - abs($degree);
         }
-        return array($direction.', '.$bearing, abs($convertedDegree));
+        $degree = floor($angle);
+        $minutes = round(($angle - $degree) * 60, 2);
+        $bearing = ($degree >= 0) ? 'E' : 'W';
+
+        return [$direction, $bearing, $degree, $minutes];
     }
 
     // Calculate destination point given distance and bearing from starting point
@@ -53,9 +53,8 @@ class PlotterController extends Controller
 	                λ2 = λ1 + atan2( sin θ ⋅ sin δ ⋅ cos φ1, cos δ − sin φ1 ⋅ sin φ2 )
                     where 	φ is latitude, λ is longitude, θ is the bearing (clockwise from north), δ is the angular distance d/R; d being the distance travelled, R the earth’s radius
                     Source: https://www.movable-type.co.uk/scripts/latlong.html
-        */
-        $R = 6371e3; // Earth's radius in metres
-        $delta = $distance / $R; // in metres
+        */     
+        $delta = $distance / self::$R; // angular distance in radians
         $theta = deg2rad($degree); // in radians
 
         $phi1 = deg2rad($startingY); 
@@ -77,6 +76,26 @@ class PlotterController extends Controller
             'Bearing' => $direction.' '.$angle.'° '.$minutes."' ".$bearing,
             'Distance' => $distance
         ];
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2){
+        // Haversine formula to calculate distance between two points
+        $phi1 = deg2rad($lat1);
+        $phi2 = deg2rad($lat2);
+        $deltaPhi = deg2rad($lat2 - $lat1);
+        $deltaLambda = deg2rad($lon2 - $lon1);
+
+        $a = sin($deltaPhi/2) * sin($deltaPhi/2) +
+            cos($phi1) * cos($phi2) *
+            sin($deltaLambda/2) * sin($deltaLambda/2);
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        // Bearing formula to calculate bearing between two points
+        $y = sin($deltaLambda) * cos($phi2);
+        $x = cos($phi1) * sin($phi2) - sin($phi1) * cos($phi2) * cos($deltaLambda);
+        $bearing = atan2($y, $x);   
+        $bearing = rad2deg(num: $bearing);
+
+        return [round(self::$R * $c, 6), ...$this->degreeToBearing($bearing)];
     }
 
     public function outputCoords($lotJsonData){
@@ -107,15 +126,16 @@ class PlotterController extends Controller
             $pLat = $tieMapCoord[1];
 
             $lotInfo = [
+                "plotId" => $lotItem['id'],
                 "plotName" => $lotItem['plotname'] ?? 'Plot '.($i+1),
                 "tieLabel" => $this->informationBuilder('Tie Point', $tieInfo['direction'], $tieInfo['degree'], $tieInfo['minutes'], $tieInfo['bearing'], $tieInfo['distance']),
                 "endPoint" => [
                     "latitude" => round($pLat,6),
                     "longitude" => round($pLon,6)
                 ],
-                "points" => []
+                "points" => [],
+                "marginDistance" => []
             ];
-                
             //Mapping Full Body Coordinates
             foreach($lotItem['points'] as $j => $pointItem){
                 $pointAngle = $this->bearingToDegree(
@@ -141,6 +161,18 @@ class PlotterController extends Controller
                 $pLon = $pointMapCoord[0];
                 $pLat = $pointMapCoord[1];
             }
+
+            $marginDist = $this->calculateDistance(
+                $tieMapCoord[1], 
+                $tieMapCoord[0], 
+                $lotInfo['points'][count($lotInfo['points']) - 1]['latitude'], 
+                $lotInfo['points'][count($lotInfo['points']) - 1]['longitude']
+            );
+            $marginInfo = $this->informationBuilder('Line '.count($lotInfo['points'] ).'- 1', $marginDist[1], $marginDist[3],$marginDist[4], $marginDist[2],round($marginDist[0],2));
+            $lotInfo['marginDistance'] = [
+                "distance" => round($marginDist[0],2),
+                "pointLabel" => $marginInfo
+            ];
             array_push($fullLotInfo, $lotInfo);
         }
 
