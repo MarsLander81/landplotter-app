@@ -1,68 +1,82 @@
-[
-  {
-    "plotName": "New Plot",
-    "tieLabel": {
-      "Line": "Tie Point",
-      "Bearing": "N 0° 0' E",
-      "Distance": 0
-    },
-    "endPoint": {
-      "latitude": 14.174809,
-      "longitude": 121.151123
-    },
-    "points": [
-      {
-        "pointId": "PPT-mlf7hyayaii",
-        "pointNumber": 1,
-        "pointLabel": {
-          "Line": "Line 1",
-          "Bearing": "N 90° 0' E",
-          "Distance": 10
-        },
-        "latitude": 14.174809,
-        "longitude": 121.151216,
-        "canvasX": "390.00",
-        "canvasY": "263.44"
+{
+  "lotTitle": "N/A",
+  "lotAddress": "LOT 17 - 14.21433926, 121.15112305",
+  "tiePoint": {
+    "tieLoc": "N/A",
+    "tieCity": "N/A",
+    "tieRef": "N/A",
+    "tieLabel": "LOT 17 - 14.21433926, 121.15112305",
+    "tieLatitude": 14.214339,
+    "tieLongitude": 121.151123
+  },
+  "lotItem": [
+    {
+      "plotId": "PI-mmhqgier8ax",
+      "plotName": "New Plot",
+      "tieLabel": {
+        "Line": "Tie Point",
+        "Bearing": "N 90° 0' W",
+        "Distance": 1200
       },
-      {
-        "pointId": "PPT-mlf7hyayi0v",
-        "pointNumber": 2,
-        "pointLabel": {
-          "Line": "Line 2",
-          "Bearing": "S 180° 0' E",
-          "Distance": 5
-        },
-        "latitude": 14.174854,
-        "longitude": 121.151216,
-        "canvasX": "390.00",
-        "canvasY": "136.56"
+      "endPoint": {
+        "latitude": 14.214339,
+        "longitude": 121.13999
       },
-      {
-        "pointId": "PPT-mlf7hyayfou",
-        "pointNumber": 3,
-        "pointLabel": {
-          "Line": "Line 3",
-          "Bearing": "S 90° 0' W",
-          "Distance": 5
+      "points": [
+        {
+          "pointId": "PPT-mmhqgier2i2",
+          "pointNumber": 1,
+          "pointLabel": {
+            "Line": "Line 1",
+            "Bearing": "N 45° 0' E",
+            "Distance": 18
+          },
+          "latitude": 14.214453,
+          "longitude": 121.140108
         },
-        "latitude": 14.174854,
-        "longitude": 121.15117,
-        "canvasX": "264.24",
-        "canvasY": "136.56"
-      },
-      {
-        "pointId": "PPT-mlf7hyayzk4",
-        "pointNumber": 4,
-        "pointLabel": {
-          "Line": "Line 4",
-          "Bearing": "N 90° 0' W",
-          "Distance": 10
+        {
+          "pointId": "PPT-mmhqgier7ef",
+          "pointNumber": 2,
+          "pointLabel": {
+            "Line": "Line 2",
+            "Bearing": "S 45° 0' E",
+            "Distance": 12
+          },
+          "latitude": 14.214377,
+          "longitude": 121.140187
         },
-        "latitude": 14.174854,
-        "longitude": 121.151077,
-        "canvasX": "10.00",
-        "canvasY": "136.56"
+        {
+          "pointId": "PPT-mmhqgierfrn",
+          "pointNumber": 3,
+          "pointLabel": {
+            "Line": "Line 3",
+            "Bearing": "S 45° 0' W",
+            "Distance": 18
+          },
+          "latitude": 14.214263,
+          "longitude": 121.140069
+        },
+        {
+          "pointId": "PPT-mmhqgierk2h",
+          "pointNumber": 4,
+          "pointLabel": {
+            "Line": "Line 4",
+            "Bearing": "N 45° 0' W",
+            "Distance": 10
+          },
+          "latitude": 14.214327,
+          "longitude": 121.140003
+        }
+      ],
+      "marginDistance": {
+        "distance": 1.93,
+        "pointLabel": {
+          "Line": "Line 4- 1",
+          "Bearing": "S 46° 24.1' E",
+          "Distance": 1.93
+        }
       }
-    ]
-  }
-]
+    }
+  ],
+  "maxDistancePoint": 1
+} 
